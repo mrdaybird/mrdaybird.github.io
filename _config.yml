@@ -19,7 +19,7 @@
 # in the templates via {{ site.myvariable }}.
 
 
-baseurl: "/" # the subpath of your site, e.g. /blog
+baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 
 #######################################################################
@@ -58,7 +58,7 @@ user:
   name: Vaibhav P
   bio: A human being trying to make a place in this world.
   email: pathakvaibhav43@gmail.com
-  photo: /eridanus/assets/img/flowsnake.png
+  photo: /assets/img/flowsnake.png
   alt_link: 
   social: # just leave the field blank or type in null, if you don't have a
           # particular social media account and it won't appear
