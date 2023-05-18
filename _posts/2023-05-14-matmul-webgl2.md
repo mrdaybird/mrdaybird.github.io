@@ -9,7 +9,7 @@ Let's start with some background on what we are dealing with here. If you are al
 
 Also, disclaimer, I wrote this blog because I could not find any good resources for the same, so learned to do it myself. I am a beginner to WebGL, so this blog is more like a personal note on things I have learned. 
 
-### Introduction 
+## Introduction 
 
 Fundamental to any deep learning system is the ability to multiply two matrices, and to do it quickly and efficiently. GPUs are great at doing just that. They specialize in doing one thing at a large scale, using an architecture called [Single Instruction, Multiple Threads](https://en.wikipedia.org/wiki/Single_instruction,_multiple_threads), leveraging their many cores and threads. These features of the GPU enable them to process large amounts of data efficiently.
 
