@@ -29,7 +29,7 @@ We will be using a wrapper library over webgl called [twgl.js](https://github.co
 
 To keep things simple, we will be writing the entire code inside the HTML file. Since we will be using *twgl.js*, go ahead and get that from their [github repo](https://github.com/greggman/twgl.js). We will only be using the *twgl-full.module.js* file from it which is inside the *dist/5.x/* folder, you can copy that file to the current working directory. 
 
-Create an *index.html* file, which will only contain our script. 
+Create an *index.html* file, which will only contain our script.
 
 So your *index.html* should look something like this at this moment:
 
@@ -61,7 +61,7 @@ Since webgl was designed for rendering graphics, we have to write pairs of progr
 
 The vertex shader is used to process and compute the vertex positions of a shape and the fragment shader computes the color of each pixel of the shape that is being drawn. 
 
-To understand what is happening, take a look at this figure that shows the operations that are performed by webgl to render graphics on our screen: 
+To understand what is happening, take a look at this figure that shows the operations that are performed by webgl to render graphics on our screen:
 
 <figure class="wp-caption">
 <img src="/assets/img/renderingpipeline_webgl.png" /> <figcaption class="wp-caption-text">WebGL Rendering Pipeline <a href="https://www.geeksforgeeks.org/webgl-introduction/" target="_blank" rel="noopener noreferrer"><strong>Source</strong></a></figcaption>
@@ -105,7 +105,7 @@ void main(){
   gl_Position = position;
 }
 `;
-  
+
 const fs = `
 #version 300 es
 precision highp float;
@@ -217,7 +217,7 @@ matB : {
 {% endhighlight %}
 
 We have to tell the program where the textures are. The *twgl.js* lib makes it easy things easy for us. For now, let's store the textures in an array. 
- 
+
 {% highlight javascript %}
 const uniforms = {
   matA : textures.matA,
@@ -243,14 +243,14 @@ const matC = twgl.createTexture(gl, {
     type : gl.FLOAT,
     minMag : gl.NEAREST
   });
-  
+
   const attachments = [
     { format : gl.RED,
       attachment : matC,
       type : gl.FLOAT,
     }
   ];
-  
+
 const fbi = twgl.createFramebufferInfo(gl, attachments, n, n);
 {% endhighlight %}
 
