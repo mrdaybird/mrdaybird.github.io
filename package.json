@@ -1,0 +1,26 @@
+{
+    "name": "my-blog",
+    "version": "0.1",
+    "main": "index.js",
+    "scripts": {
+        "start": "ts-node src/server.ts",
+        "dev": "nodemon --watch src --watch src/public -e ts,html,css --exec ts-node src/server.ts",
+        "build:static": "ts-node src/generateStaticSite.ts"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "MIT",
+    "description": "",
+    "devDependencies": {
+        "@types/express": "^5.0.0",
+        "nodemon": "^3.1.7",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.6.3"
+    },
+    "dependencies": {
+        "express": "^4.21.1",
+        "highlight.js": "^11.10.0",
+        "marked": "^14.1.4",
+        "marked-highlight": "^2.2.0"
+    }
+}

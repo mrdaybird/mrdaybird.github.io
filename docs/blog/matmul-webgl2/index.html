@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Matrix Multiplication using WebGL2</title>
+
+        <!-- Fonts -->
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+
+        <link rel="stylesheet" href="/styles.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/tokyo-night-dark.min.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <header>
+                <h1 class="title">[[ eridanus ]]</h1>
+                <nav>
+                    <a href="/">Home</a>
+                    <!-- <a href="#">Now</a> -->
+                    <!-- <a href="#">Projects</a> -->
+                    <a href="/blog">Blog</a>
+                </nav>
+            </header>
+
+            <main>
+                <div id="content">
+                <h2>Matrix Multiplication using WebGL2</h2><p>Let&#39;s start with some background on what we are dealing with here. If you are already familiar with webgl, you can skip the <em>Introduction</em> section to <a href="#clearing-the-ground-for-the-real-stuff">some real code</a>.</p>
+<p>Also, disclaimer, I wrote this blog because I could not find any good resources for the same, so learned to do it myself. I am a beginner to WebGL, so this blog is more like a personal note on things I have learned. </p>
+<h2>Introduction</h2>
+<p>Fundamental to any deep learning system is the ability to multiply two matrices, and to do it quickly and efficiently. GPUs are great at doing just that. They specialize in doing one thing at a large scale, using an architecture called <a href="https://en.wikipedia.org/wiki/Single_instruction,_multiple_threads">Single Instruction, Multiple Threads</a>, leveraging their many cores and threads. These features of the GPU enable them to process large amounts of data efficiently.</p>
+<p><strong>So what is a GPU?</strong></p>
+<p>Graphics Processing Units or GPUs were originally designed to perform efficient computer graphics and image processing. Later, it was realized that their design makes them appropriate tools for training neural networks, so currently in the market, some GPUs are optimized to utilize their computing capabilities.</p>
+<p><strong>What is WebGL?</strong></p>
+<p>WebGL(Web Graphics Library) is a Javascript API for writing interactive 2D/3D graphics in the browser, leveraging the capabilities of the GPU. So, WebGL is not designed to perform general mathematical operations, so there will be boilerplate stuff that we have to deal with to reach our end goal. WebGL2 is a major update from the previous WebGL 1.0 that adds additional capabilities to the users, few of those features are very useful to us as well, which we will later see. </p>
+<p>From now on, WebGL will be stylized as <em>webgl</em>, and matrix multiplication will be shortened to <em>matmul</em>. So, let&#39;s start implementing our <em>matmul</em> code.</p>
+<p>We will be using a wrapper library over webgl called <a href="https://github.com/greggman/twgl.js/">twgl.js</a> to reduce the boilerplate code since webgl code can be lengthy and tedious. I will try to keep the code simple and stick to our orignal goal.</p>
+<h2>Clearing the ground, for the <em>real</em> stuff</h2>
+<p>To keep things simple, we will be writing the entire code inside the HTML file. Since we will be using <em>twgl.js</em>, go ahead and get that from their <a href="https://github.com/greggman/twgl.js">github repo</a>. We will only be using the <em>twgl-full.module.js</em> file from it which is inside the <em>dist/5.x/</em> folder, you can copy that file to the current working directory. </p>
+<p>Create an <em>index.html</em> file, which will only contain our script.</p>
+<p>So your <em>index.html</em> should look something like this at this moment:</p>
+<pre><code class="hljs language-html"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span>&gt;</span><span class="language-javascript">
+    <span class="hljs-keyword">import</span> * <span class="hljs-keyword">as</span> twgl <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;twgl-full.module.js&#x27;</span>;
+  </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+</code></pre><p>To actually use webgl, we would have to get a <em>render context</em> from the <em>canvas</em> element.</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> canvas = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">createElement</span>(<span class="hljs-string">&quot;canvas&quot;</span>);
+<span class="hljs-keyword">const</span> gl = canvas.<span class="hljs-title function_">getContext</span>(<span class="hljs-string">&quot;webgl2&quot;</span>);
+</code></pre><h2>Writing code for the GPU</h2>
+<p>Since the GPU is a separate piece of hardware on the computer, writing code for the GPU is not the same as writing code for the CPU. GPU have their own processor and memory. To utilize them, you have to write programs called <em>shaders</em>. In webgl, shaders are written in a C-like language called GLSL. </p>
+<p><strong>Rendering pipeline</strong></p>
+<p>Since webgl was designed for rendering graphics, we have to write pairs of programs, called vertex shader and fragment shader. In webgl, the set of these shaders is called a <em>program</em>. </p>
+<p>The vertex shader is used to process and compute the vertex positions of a shape and the fragment shader computes the color of each pixel of the shape that is being drawn. </p>
+<p>To understand what is happening, take a look at this figure that shows the operations that are performed by webgl to render graphics on our screen:</p>
+<figure>
+<img src="/assets/img/renderingpipeline_webgl.png" /> <figcaption>WebGL Rendering Pipeline <a href="https://www.geeksforgeeks.org/webgl-introduction/" target="_blank" rel="noopener noreferrer"><strong>Source</strong></a></figcaption>
+</figure>
+
+<p>In the end, what webgl is doing is calculating colors for each pixel on a 2D space. In webgl, what we render to is called <em>framebuffer</em>.  </p>
+<p>Another thing we should know about before we go on ahead is a <strong>texture</strong>. A texture is a 2D image, that is generally used to add detail to objects. These textures can also be used to store arbitrary data and the entire texture can be easily accessed by our shaders.</p>
+<h2>The <em><strong>real</strong></em> stuff</h2>
+<p>From what we have learned, we have answered a very important question: <strong>How will we be storing our matrices in the GPU?</strong></p>
+<p>We will be utilizing the following features of webgl2: 1. We can use textures to store arbitrary data. 2. Texture can be easily accessed by our shaders. 3. We can render to a texture using a framebuffer.</p>
+<p>This makes textures ideal candidates for storing matrices.</p>
+<p><strong>How will we be using vertex shaders and fragment shaders to multiply two matrices?</strong> </p>
+<p>As we have already learned, unlike CPU, GPU code works on multiple data at the same time. So, using the same CPU code, to our shaders will do us no good. What we will be doing is splitting our original task is smaller parts that are not interdependent. </p>
+<p>So, how can we split matrix multiplication into smaller parts?</p>
+<figure>
+<img src="/assets/img/matrixmultiplication.png" /> <figcaption>Take a look at this picture to understand what is happening during matrix multiplication. To see the full animation, go to the original source of the snippet: <a href="https://www.geogebra.org/m/ETHXK756" target="_blank" rel="noopener noreferrer">Matrix Multiplication Animated Example</a></figcaption>
+</figure>
+Matrix multiplication is essentially a series of dot-products between rows of the first matrices to the columns of the second matrices, to be more verbose we are multiplying the rows of the first matrix by columns in the second matrix.
+
+<p>So, each shader will essentially be a dot product of a row and a column.</p>
+<p>Our vertex shader and fragment shader will look like this:</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> vs = <span class="hljs-string">`
+#version 300 es
+
+in vec4 position;
+
+void main(){
+  gl_Position = position;
+}
+`</span>;
+
+<span class="hljs-keyword">const</span> fs = <span class="hljs-string">`
+#version 300 es
+precision highp float;
+
+in vec4 position;
+
+uniform sampler2D matA;
+uniform sampler2D matB;
+
+out vec4 outColor;
+
+vec4 dotproduct(int rowIdx, int columnIdx, int rowLengthA){
+    vec4 sum = vec4(0.0);
+
+    for(int k = 0; k &lt; rowLengthA; k++){
+      vec4 elementA = texelFetch(matA, ivec2(k, rowIdx), 0);
+      vec4 elementB = texelFetch(matB, ivec2(columnIdx, k), 0);
+      sum += elementA * elementB;
+    }
+
+    return sum;
+}
+
+void main(){
+  ivec2 texelCoord = ivec2(gl_FragCoord.xy);
+  int rowIdx = texelCoord.y;
+  int columnIdx = texelCoord.x;
+
+  ivec2 dimA = textureSize(matA, 0);
+
+  outColor = dotproduct(rowIdx, columnIdx, dimA.x);
+}</span>
+</code></pre><p>Let&#39;s understand what is happening here. We will skip the vertex shader(stored in the <em>vs</em> variable) and look at the fragment shader(stored in the <em>fs</em> variable)</p>
+<ol>
+<li>The variable <code>matA</code> and <code>matB</code> of type <code>uniform sampler2D</code>, are the textures storing the matrices A and B. The <code>sampler2D</code> refers to a 2D texture and <code>uniform</code> refers to the fact that these variables will be the same across all invocations of the shaders.  </li>
+<li><code>outColor</code> is the output value of the pixel. </li>
+<li>The <code>dotproduct</code> function computes the dot product of a row and a column. </li>
+<li>The <code>texelFetch</code> function is an in-built function that looks up a pixel from a texture. It takes in the texture as the first parameter and <code>ivec2</code> (integer vector of dimension 2) as the second parameter. The third parameter is always 0. (<em>don&#39;t ask me idk why</em>)</li>
+</ol>
+<p>That&#39;s pretty much it in the fragment shader, which is our main piece of code.</p>
+<p>Let&#39;s go over the rest of the code that will create the textures and use the shaders to multiply two matrices.</p>
+<p>To store our shaders and compile them for the GPU, we have to create a <em>program</em>:</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> programInfo = twgl.<span class="hljs-title function_">createProgramInfo</span>(gl, [vs, fs]);
+</code></pre><p>For our fragment shader to work for all pixels of our output texture, we will create a rectangle covering our entire texture:</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> arrays = {
+position : { numComponents : <span class="hljs-number">2</span>,  <span class="hljs-attr">data</span>: [
+    -<span class="hljs-number">1</span>, -<span class="hljs-number">1</span>,
+     <span class="hljs-number">1</span>, -<span class="hljs-number">1</span>,
+    -<span class="hljs-number">1</span>,  <span class="hljs-number">1</span>,
+    -<span class="hljs-number">1</span>,  <span class="hljs-number">1</span>,
+     <span class="hljs-number">1</span>, -<span class="hljs-number">1</span>,
+     <span class="hljs-number">1</span>,  <span class="hljs-number">1</span>]
+    }};
+
+<span class="hljs-keyword">const</span> bufferInfo = twgl.<span class="hljs-title function_">createBufferInfoFromArrays</span>(gl, arrays);
+twgl.<span class="hljs-title function_">setBuffersAndAttributes</span>(gl, programInfo, bufferInfo);
+</code></pre><p>Now let&#39;s create random data for our matrices.</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> n = <span class="hljs-number">4</span>, m = <span class="hljs-number">3</span>;
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">random</span>(<span class="hljs-params">N</span>){
+<span class="hljs-keyword">const</span> arr = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Float32Array</span>(N);
+
+<span class="hljs-keyword">for</span>(<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; N; i++)
+  arr[i] = <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">random</span>();
+
+<span class="hljs-keyword">return</span> arr;
+}
+
+<span class="hljs-keyword">const</span> A = <span class="hljs-title function_">random</span>(n*m);
+<span class="hljs-keyword">const</span> B = <span class="hljs-title function_">random</span>(n*m);
+</code></pre><p>Now let&#39;s store the matrices in a texture.</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> textures = twgl.<span class="hljs-title function_">createTextures</span>(gl, {
+matA : {
+  width : m,
+  height : n,
+  src : A,
+  internalFormat : gl.<span class="hljs-property">R32F</span>,
+  format : gl.<span class="hljs-property">RED</span>,
+  minMag : gl.<span class="hljs-property">NEAREST</span>
+},
+matB : {
+  width : n,
+  height : m,
+  src : B,
+  internalFormat : gl.<span class="hljs-property">R32F</span>,
+  format : gl.<span class="hljs-property">RED</span>,
+  minMag : gl.<span class="hljs-property">NEAREST</span>
+}
+});
+</code></pre><p>We have to tell the program where the textures are. The <em>twgl.js</em> lib makes it easy things easy for us. For now, let&#39;s store the textures in an array. </p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> uniforms = {
+  matA : textures.<span class="hljs-property">matA</span>,
+  matB : textures.<span class="hljs-property">matB</span>
+};
+</code></pre><p>We also have to create an output texture for the resultant matrix. But before we do that, we have to enable an extension, since rendering to texture with floating-point values is not enabled by default. </p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> ext = gl.<span class="hljs-title function_">getExtension</span>(<span class="hljs-string">&quot;EXT_color_buffer_float&quot;</span>);
+</code></pre><p>Let&#39;s create our output texture and bind it to a framebuffer:</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> matC = twgl.<span class="hljs-title function_">createTexture</span>(gl, {
+    width : n,
+    height : n,
+    internalFormat : gl.<span class="hljs-property">R32F</span>,
+    format : gl.<span class="hljs-property">RED</span>,
+    type : gl.<span class="hljs-property">FLOAT</span>,
+    minMag : gl.<span class="hljs-property">NEAREST</span>
+  });
+
+  <span class="hljs-keyword">const</span> attachments = [
+    { format : gl.<span class="hljs-property">RED</span>,
+      attachment : matC,
+      type : gl.<span class="hljs-property">FLOAT</span>,
+    }
+  ];
+
+<span class="hljs-keyword">const</span> fbi = twgl.<span class="hljs-title function_">createFramebufferInfo</span>(gl, attachments, n, n);
+</code></pre><p>Now, we just have to set the input textures and render to the output texture.</p>
+<pre><code class="hljs language-javascript">gl.<span class="hljs-title function_">bindFramebuffer</span>(gl.<span class="hljs-property">FRAMEBUFFER</span>, fbi.<span class="hljs-property">framebuffer</span>);
+
+gl.<span class="hljs-title function_">viewport</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, n, n);
+gl.<span class="hljs-title function_">useProgram</span>(programInfo.<span class="hljs-property">program</span>);
+twgl.<span class="hljs-title function_">setUniforms</span>(programInfo, uniforms);
+twgl.<span class="hljs-title function_">drawBufferInfo</span>(gl, bufferInfo);
+</code></pre><p>At this point, our output texture will contain the resultant matrix, we can read the texture as follow:</p>
+<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> pixels = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Float32Array</span>(n*n*<span class="hljs-number">4</span>);
+gl.<span class="hljs-title function_">readPixels</span>(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, n, n, gl.<span class="hljs-property">RGBA</span>, gl.<span class="hljs-property">FLOAT</span>, pixels);
+
+<span class="hljs-keyword">const</span> results = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Float32Array</span>(n*n);
+<span class="hljs-keyword">for</span>(<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; n*n; i++)
+results[i] = pixels[i*<span class="hljs-number">4</span>];
+</code></pre><p>Let&#39;s also display our matrices in the window.</p>
+<pre><code class="hljs language-javascript"><span class="hljs-title function_">displayMatrix</span>(A, n, m, <span class="hljs-string">&quot;A&quot;</span>);
+<span class="hljs-title function_">displayMatrix</span>(B, m, n, <span class="hljs-string">&quot;B&quot;</span>);
+<span class="hljs-title function_">displayMatrix</span>(results, n, n, <span class="hljs-string">&quot;C&quot;</span>)
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">displayMatrix</span>(<span class="hljs-params">mat, N, M, tag</span>){
+    <span class="hljs-title function_">log</span>(<span class="hljs-string">`<span class="hljs-subst">${tag}</span>:\n<span class="hljs-subst">${createMatString(mat, N, M)}</span>`</span>);
+}
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">createMatString</span>(<span class="hljs-params">mat, N, M</span>){
+    <span class="hljs-keyword">let</span> str = <span class="hljs-string">&quot;&quot;</span>;
+    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; N; i++){
+      <span class="hljs-keyword">for</span>(<span class="hljs-keyword">let</span> j = <span class="hljs-number">0</span>; j &lt; M; j++){
+        str += <span class="hljs-string">`<span class="hljs-subst">${mat[i * M + j].toFixed(<span class="hljs-number">5</span>)}</span> `</span>;
+      }
+      str += <span class="hljs-string">&#x27;\n&#x27;</span>;
+    }
+
+    <span class="hljs-keyword">return</span> str;
+}
+
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">log</span>(<span class="hljs-params">...args</span>) {
+    <span class="hljs-keyword">const</span> elem = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">createElement</span>(<span class="hljs-string">&#x27;pre&#x27;</span>);
+    elem.<span class="hljs-property">textContent</span> = args.<span class="hljs-title function_">join</span>(<span class="hljs-string">&#x27; &#x27;</span>);
+    <span class="hljs-variable language_">document</span>.<span class="hljs-property">body</span>.<span class="hljs-title function_">appendChild</span>(elem);
+}
+</code></pre><p>Voila, we have multiplied two matrices using webgl. Yay!</p>
+<p><a href="https://gist.github.com/mrdaybird/7c0978f8752db96d7d659090bd50a9b9">Here&#39;s the link</a> to the complete code.</p>
+<h3>References</h3>
+<ol>
+<li><a href="https://webgl2fundamentals.org/">WebGL2 Fundamentals</a> is a good resource for learning about webgl in general.</li>
+<li><a href="https://webgl2fundamentals.org/webgl/lessons/webgl-gpgpu.html">WebGL2 GPGPU</a> is an excellent source for learning about general purpose programming using webgl. <strong>This is where I began.</strong></li>
+<li><a href="https://www.google.com/search?client=firefox-b-d&q=learnopengl">LearnOpenGL</a></li>
+</ol>
+
+                </div>
+            </main>
+
+
+            <footer>
+                <p>Subscribe or say hello!</p>
+                <!-- <p>Powered by [Your Blog Platform]</p> -->
+            </footer>
+        </div>
+    </body>
+</html>

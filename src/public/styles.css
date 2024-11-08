@@ -1,0 +1,226 @@
+/* src/public/styles.css */
+
+/* Global Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Based on mint.css on monkeytype */
+:root {
+    --bg-color: #05385b;
+    --main-color: #5cdb95;
+    --caret-color: #5cdb95;
+    --sub-color: #20688a;
+    --sub-alt-color: #07324e;
+    --text-color: #edf5e1;
+    --error-color: #f35588;
+    --error-extra-color: #a3385a;
+    --colorful-error-color: #f35588;
+    --colorful-error-extra-color: #a3385a;
+}
+
+body {
+    font-family: 'Roboto', sans-serif; /* Main font */
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Adding padding and margins to improve readability */
+h1, h2, h3 {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    padding-left: 0.5em;
+    color: var(--main-color);
+}
+
+h1 {
+    font-size: 2rem;
+}
+
+h2 {
+    font-size: 1.75rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+/* Paragraph styling */
+p {
+    margin: 1em 0;
+    padding-left: 0.5em;
+    color: #fff;
+}
+
+/* Padding around main content */
+main {
+    max-width: 800px;
+    margin: auto;
+    /* padding: 1rem; */
+}
+
+/* List styling */
+ol {
+    padding-left: 40px;
+    margin-top: 16px;
+    color: #fff;
+}
+
+li {
+    margin-bottom: 0.5em;
+    /* padding-left: 1.2em; */
+}
+
+/* Code block styling */
+pre {
+    border-radius: 5px;
+    overflow-x: auto;
+}
+
+code {
+    font-family: 'Courier New', Courier, monospace;
+}
+
+/* src/public/styles.css */
+
+/* Link styling */
+a {
+    color: #80caff; /* Light blue color for better contrast */
+    text-decoration: none; /* Remove underline for cleaner look */
+    transition: color 0.3s ease, border-bottom 0.3s ease; /* Smooth transition */
+    border-bottom: 1px solid transparent; /* Adds underline effect on hover */
+}
+
+/* Hover effect for links */
+a:hover {
+    color: #a3e8ff; /* Lighter shade on hover */
+    border-bottom: 1px solid #a3e8ff; /* Show underline on hover */
+}
+
+/* Active state for links */
+a:active {
+    color: #66b2e8; /* Darker shade when clicked */
+}
+
+nav {
+    margin-top: 10px;
+    border-bottom: 0; 
+}
+
+/* Specific styling for navigation links if needed */
+nav a {
+    padding: 0.5em;
+    color: #ffffff;
+    margin: 0 15px;
+    border-bottom: 0;
+}
+
+nav a:hover {
+    color: #a3e8ff;
+    text-decoration: none;
+    border-bottom: 0; /* Show underline on hover */
+    font-size: 1em;
+}
+
+.container {
+    max-width: 800px;
+    width: 100%;
+    padding: 20px;
+}
+
+img {
+    max-width:100%;
+    max-height:100%;
+    border-radius: 10px;
+}
+
+figcaption {
+    text-align: center;
+}
+
+figure {
+    display: block;
+    margin: 40px;
+}
+
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+.title {
+    font-family: "Roboto Mono", monospace;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    color: var(--main-color);
+}
+
+/* Header */
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Intro Section */
+.intro {
+    text-align: left;
+    max-width: 600px;
+    margin: 40px 0;
+}
+
+.intro h2 {
+    font-size: 1.8em;
+    color: var(--text-color);
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.intro p {
+    font-size: 1.2em;
+    color: #c0d6df;
+}
+
+/* Posts Section */
+.posts {
+    text-align: left;
+    max-width: 600px;
+    margin: 40px 0;
+}
+
+.posts h3 {
+    font-size: 1.5em;
+    font-weight: 600; /* Bold weight */
+    margin-bottom: 10px;
+    padding-left: 0px;
+}
+
+.posts ul {
+    list-style-type: none;
+    padding-left: 10px;
+}
+
+.posts li {
+    margin: 10px 0;
+}
+
+/* Footer */
+footer {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 0.9em;
+    color: var(--text-color);
+}
+
+footer p {
+    margin: 5px 0;
+}
+

@@ -1,0 +1,87 @@
+/* src/public/styles.css */
+
+/* Global Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #0a0f18;
+    color: #c0d6df;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 800px;
+    width: 100%;
+    padding: 20px;
+}
+
+/* Header */
+header {
+    text-align: left; /* Left-align header */
+    margin-bottom: 30px; /* Add more space below header */
+}
+
+header h1 {
+    font-weight: 700;
+    font-size: 2.5em;
+    color: #fff;
+}
+
+nav {
+    margin-top: 10px; /* Add some space between the header title and nav links */
+}
+
+nav a {
+    color: #c0d6df;
+    text-decoration: none;
+    margin: 0 15px;
+    font-size: 1em;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+/* Intro Section */
+.intro {
+    text-align: left;
+    max-width: 600px;
+    margin: 40px 0; /* Add space above and below intro section */
+}
+
+.intro h2 {
+    font-size: 1.8em;
+    color: #ffffff;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.intro p {
+    font-size: 1.2em;
+    color: #c0d6df;
+}
+
+/* Posts Section */
+.posts {
+    text-align: left;
+    max-width: 600px;
+    margin: 40px 0; /* Add space above and below posts section */
+}
+
+.posts h3 {
+    font-size: 1.5em;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.posts ul {
+
