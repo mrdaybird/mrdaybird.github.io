@@ -8,18 +8,33 @@
 }
 
 /* Based on mint.css on monkeytype */
+/* :root { */
+/*     --bg-color: #05385b; */
+/*     --main-color: #5cdb95; */
+/*     --caret-color: #5cdb95; */
+/*     --sub-color: #20688a; */
+/*     --sub-alt-color: #07324e; */
+/*     --text-color: #edf5e1; */
+/*     --error-color: #f35588; */
+/*     --error-extra-color: #a3385a; */
+/*     --colorful-error-color: #f35588; */
+/*     --colorful-error-extra-color: #a3385a; */
+/* } */
+
+/* Based on midnight.css on monkeytype */
 :root {
-    --bg-color: #05385b;
-    --main-color: #5cdb95;
-    --caret-color: #5cdb95;
-    --sub-color: #20688a;
-    --sub-alt-color: #07324e;
-    --text-color: #edf5e1;
-    --error-color: #f35588;
-    --error-extra-color: #a3385a;
-    --colorful-error-color: #f35588;
-    --colorful-error-extra-color: #a3385a;
+  --bg-color: #0b0e13;
+  --main-color: #60759f;
+  --caret-color: #60759f;
+  --sub-color: #394760;
+  --sub-alt-color: #141a24;
+  --text-color: #9fadc6;
+  --error-color: #c27070;
+  --error-extra-color: #c28b70;
+  --colorful-error-color: #c27070;
+  --colorful-error-extra-color: #c28b70;
 }
+
 
 body {
     font-family: 'Roboto', sans-serif; /* Main font */
@@ -56,7 +71,7 @@ h3 {
 p {
     margin: 1em 0;
     padding-left: 0.5em;
-    color: #fff;
+    /* color: #fff; */
 }
 
 /* Padding around main content */
@@ -70,13 +85,17 @@ main {
 ol {
     padding-left: 40px;
     margin-top: 16px;
-    color: #fff;
+    /* color: #fff; */
 }
 
 li {
     margin-bottom: 0.5em;
-    /* padding-left: 1.2em; */
 }
+
+ul {
+    padding-left: 40px;
+}
+
 
 /* Code block styling */
 pre {
@@ -117,7 +136,8 @@ nav {
 /* Specific styling for navigation links if needed */
 nav a {
     padding: 0.5em;
-    color: #ffffff;
+    /* color: #ffffff; */
+    color: var(--text-color);
     margin: 0 15px;
     border-bottom: 0;
 }
